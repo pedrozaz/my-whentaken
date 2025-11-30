@@ -4,7 +4,6 @@ import io.github.pedrozaz.whentaken.backend.dto.CreateRoomRequest;
 import io.github.pedrozaz.whentaken.backend.dto.JoinRequest;
 import io.github.pedrozaz.whentaken.backend.model.GameRoom;
 import io.github.pedrozaz.whentaken.backend.service.GameService;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
