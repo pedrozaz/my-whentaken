@@ -28,17 +28,15 @@ export default function Home() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-dark-900 to-[#1a0508]">
 
-            {/* Título */}
             <div className="text-center mb-12 space-y-4">
                 <div className="flex justify-center items-center gap-3 text-brand-500 mb-2">
                     <MapPin className="w-8 h-8" />
                     <Clock className="w-8 h-8" />
                 </div>
                 <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-white">
-                    CHRONO<span className="text-brand-500">WORLD</span>
+                    WHEN<span className="text-brand-500"> TAKEN</span>
                 </h1>
 
-                {/* Indicador de Status da Conexão (Para Debug) */}
                 <div className="flex items-center justify-center gap-2">
                     <span className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500' : 'bg-red-500 animate-pulse'}`}></span>
                     <p className="text-slate-400 text-sm">
@@ -47,10 +45,8 @@ export default function Home() {
                 </div>
             </div>
 
-            {/* Card Principal */}
             <div className="w-full max-w-md bg-dark-800 rounded-2xl shadow-2xl border border-white/5 p-8 backdrop-blur-sm">
 
-                {/* Botões de Toggle */}
                 <div className="flex bg-dark-900 p-1 rounded-xl mb-8">
                     <button
                         onClick={() => setMode('create')}
