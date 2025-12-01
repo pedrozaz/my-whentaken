@@ -12,6 +12,8 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -25,14 +27,16 @@ public class GameWebSocketController {
      * @action creates room and returns object's room only for creator
      */
     @MessageMapping("/create")
-    public void createRoom(@Payload CreateRoomRequest request, SimpMessageHeaderAccessor headerAccessor) {
+    public void createRoom(@Payload CreateRoomRequest request, SimpMessageHeaderAccessor headerAccessor, Principal principal) {
+        String userId = principal.getName();
         String sessionId = headerAccessor.getSessionId();
-        log.info("Request to create room from session: {}", sessionId);
+
+        log.info("Request to create room from user: {} (Session: {})", userId, sessionId);
 
         GameRoom newRoom = gameService.createRoom(sessionId);
         gameService.joinRoom(newRoom.getRoomCode(), sessionId, request.nickname());
 
-        messagingTemplate.convertAndSendToUser(sessionId, "/queue/reply", newRoom);
+        messagingTemplate.convertAndSendToUser(userId, "/queue/reply", newRoom);
     }
 
     /**
