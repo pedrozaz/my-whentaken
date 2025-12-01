@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Clock, ArrowRight, Hash } from 'lucide-react';
-import { useGameWebSocket } from '../hooks/useGameWebSocket';
+import { useGame } from "../context/GameContext.tsx";
 
 export default function Home() {
     const navigate = useNavigate();
@@ -9,12 +9,20 @@ export default function Home() {
     const [roomCode, setRoomCode] = useState('');
     const [mode, setMode] = useState<'create' | 'join'>('create');
 
-    const { connected, createRoom, joinRoom } = useGameWebSocket();
+    const { connected, createRoom, joinRoom, currentRoom } = useGame();
+
+    useEffect(() => {
+        if (currentRoom && currentRoom.roomCode) {
+            console.log("Room detected:", currentRoom.roomCode);
+            navigate(`/lobby/${currentRoom.roomCode}`);
+        }
+    }, [currentRoom, navigate]);
 
     const handleAction = () => {
         if (!nickname) return alert('Please enter a nickname');
+
         if (!connected) {
-            return alert('Conectando ao servidor... aguarde um instante.');
+            return alert('Connecting to the server...');
         }
 
         if (mode === 'create') {
