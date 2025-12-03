@@ -156,7 +156,7 @@ public class GameService {
 
     private int calculateYearScore(int guessYear, int actualYear) {
         int diff = Math.abs(guessYear - actualYear);
-        if (diff == 0) return 2500;
+        if (diff == 0) return 5000;
         return (int) (5000 * Math.exp(-diff / 10.0));
     }
 
