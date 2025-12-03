@@ -16,14 +16,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GameService {
 
-    private static final List<RoundData> MOCK_ROUNDS = List.of(
-            new RoundData("https://upload.wikimedia.org/wikipedia/commons/a/af/Eiffel_Tower_1900_01.jpg", 48.8584, 2.2945, 1900),
-            new RoundData("https://upload.wikimedia.org/wikipedia/commons/1/10/Empire_State_Building_%28aerial_view%29.jpg", 40.7484, -73.9857, 1931),
-            new RoundData("https://upload.wikimedia.org/wikipedia/commons/3/3a/Berlin_Wall_1989_fall.jpg", 52.5163, 13.3777, 1989)
-    );
-
 
     private final GameRepository gameRepository;
+    private final RoundProviderService roundProvider;
+
     private static final int CODE_LENGTH = 4;
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private final SecureRandom random = new SecureRandom();
@@ -79,10 +75,13 @@ public class GameService {
             throw new RuntimeException("Only the host can start the game!");
         }
 
+        List<RoundData> rounds = roundProvider.getRandomRounds(5);
+
+        room.setRoundsQueue(rounds);
         room.setCurrentState(GameState.PLAYING);
         room.setCurrentRoundNumber(1);
-        room.setCurrentRoundData(MOCK_ROUNDS.get(random.nextInt(MOCK_ROUNDS.size())));
-
+        room.setTotalRounds(rounds.size());
+        room.setCurrentRoundData(rounds.getFirst());
         room.setRoundEndTime(System.currentTimeMillis() + 60000);
 
         return room;
@@ -134,8 +133,9 @@ public class GameService {
         }
 
         int nextRoundIndex = room.getCurrentRoundNumber();
-        room.setCurrentRoundNumber(room.getCurrentRoundNumber() + 1);
-        room.setCurrentRoundData(MOCK_ROUNDS.get(nextRoundIndex % MOCK_ROUNDS.size()));
+        room.setCurrentRoundNumber(nextRoundIndex + 1);
+        room.setCurrentRoundData(room.getRoundsQueue().get(nextRoundIndex));
+
         room.setCurrentState(GameState.PLAYING);
         room.setRoundEndTime(System.currentTimeMillis() + 60000);
 
@@ -145,6 +145,7 @@ public class GameService {
             p.setLastGuessYear(null);
             p.setLastRoundScore(0);
         });
+
         return room;
     }
 
