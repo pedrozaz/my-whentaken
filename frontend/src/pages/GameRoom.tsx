@@ -24,6 +24,12 @@ export default function GameRoom() {
         setHasGuessed(false);
     }, [currentRoom?.currentRoundNumber]);
 
+    useEffect(() => {
+        if (currentRoom?.currentState === 'ROUND_RESULTS') {
+            navigate(`/results/${currentRoom.roomCode}`);
+        }
+    }, [currentRoom, navigate]);
+
     const handleConfirmGuess = () => {
         console.log("Sending guess");
         console.log("Status connection:", connected);

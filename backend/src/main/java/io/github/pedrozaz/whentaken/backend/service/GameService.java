@@ -113,6 +113,10 @@ public class GameService {
         boolean allGuessed = room.getPlayers().values().stream()
                 .allMatch(p -> p.getLastGuessLat() != null);
 
+        if (allGuessed) {
+            room.setCurrentState(GameState.ROUND_RESULTS);
+        }
+
         return room;
     }
 
