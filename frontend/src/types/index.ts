@@ -3,6 +3,9 @@ export interface Player {
     nickname: string;
     totalScore: number;
     lastRoundScore?: number;
+    lastGuessLat?: number;
+    lastGuessLon?: number;
+    lastGuessYear?: number;
 }
 
 export interface RoundData {

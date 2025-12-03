@@ -10,6 +10,7 @@ interface GameContextType {
     createRoom: (nickname: string) => void;
     joinRoom: (roomCode: string, nickname: string) => void;
     startGame: (roomCode: string) => void;
+    submitGuess: (roomCode: string, lat: number, lon: number, year: number) => void;
 }
 
 const GameContext = createContext<GameContextType>({} as GameContextType);
@@ -105,8 +106,17 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         });
     };
 
+    const submitGuess = (roomCode: string, lat: number, lon: number, year: number) => {
+        if (!stompClient.current?.connected) return;
+        console.log("Sending guess:", {roomCode, lat, lon, year});
+        stompClient.current.publish({
+            destination: '/app/guess',
+            body: JSON.stringify({ roomCode, lat, lon, year }),
+        });
+    };
+
     return (
-        <GameContext.Provider value={{ connected, currentRoom, createRoom, joinRoom, startGame }}>
+        <GameContext.Provider value={{ connected, currentRoom, createRoom, joinRoom, startGame, submitGuess }}>
             {children}
         </GameContext.Provider>
     );
