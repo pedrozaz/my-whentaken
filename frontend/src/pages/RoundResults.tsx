@@ -40,7 +40,7 @@ export default function RoundResults() {
         if (currentRoom?.currentState === 'PLAYING') {
             navigate(`/game/${currentRoom.roomCode}`);
         } else if (currentRoom?.currentState === 'GAME_ENDED') {
-            alert("GAME ENDED!");
+            navigate(`/podium/${currentRoom.roomCode}`);
         }
     }, [currentRoom, navigate]);
 
