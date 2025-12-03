@@ -11,6 +11,7 @@ interface GameContextType {
     joinRoom: (roomCode: string, nickname: string) => void;
     startGame: (roomCode: string) => void;
     submitGuess: (roomCode: string, lat: number, lon: number, year: number) => void;
+    nextRound: (roomCode: string) => void;
 }
 
 const GameContext = createContext<GameContextType>({} as GameContextType);
@@ -115,8 +116,16 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         });
     };
 
+    const nextRound = (roomCode: string) => {
+        if (!stompClient.current?.connected) return;
+        stompClient.current.publish({
+            destination: '/app/next-round',
+            body: roomCode,
+        })
+    }
+
     return (
-        <GameContext.Provider value={{ connected, currentRoom, createRoom, joinRoom, startGame, submitGuess }}>
+        <GameContext.Provider value={{ connected, currentRoom, createRoom, joinRoom, startGame, submitGuess, nextRound }}>
             {children}
         </GameContext.Provider>
     );

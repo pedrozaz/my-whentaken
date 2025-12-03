@@ -120,15 +120,43 @@ public class GameService {
         return room;
     }
 
+    public GameRoom nextRound(String roomCode, String requesterSessionId) {
+        GameRoom room = gameRepository.findByRoomCode(roomCode)
+                .orElseThrow(()  -> new RuntimeException("Room not found: " + roomCode));
+
+        if (!room.getHostSessionId().equals(requesterSessionId)) {
+            throw new RuntimeException("Only the host can forward rounds!");
+        }
+
+        if (room.getCurrentRoundNumber() >= room.getTotalRounds()) {
+            room.setCurrentState(GameState.GAME_ENDED);
+            return room;
+        }
+
+        int nextRoundIndex = room.getCurrentRoundNumber();
+        room.setCurrentRoundNumber(room.getCurrentRoundNumber() + 1);
+        room.setCurrentRoundData(MOCK_ROUNDS.get(nextRoundIndex % MOCK_ROUNDS.size()));
+        room.setCurrentState(GameState.PLAYING);
+        room.setRoundEndTime(System.currentTimeMillis() + 60000);
+
+        room.getPlayers().values().forEach(p -> {
+            p.setLastGuessLat(null);
+            p.setLastGuessLon(null);
+            p.setLastGuessYear(null);
+            p.setLastRoundScore(0);
+        });
+        return room;
+    }
+
     private int calculateDistanceScore(double lat1, double lon1, double lat2, double lon2) {
         double distanceKm = haversine(lat1, lon1, lat2, lon2);
-        return (int) (2500 * Math.exp(-distanceKm / 2000.0));
+        return (int) (5000 * Math.exp(-distanceKm / 5000.0));
     }
 
     private int calculateYearScore(int guessYear, int actualYear) {
         int diff = Math.abs(guessYear - actualYear);
         if (diff == 0) return 2500;
-        return (int) (2500 * Math.exp(-diff / 10.0));
+        return (int) (5000 * Math.exp(-diff / 10.0));
     }
 
     private double haversine(double lat1, double lon1, double lat2, double lon2) {

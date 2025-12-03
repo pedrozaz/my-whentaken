@@ -21,7 +21,7 @@ const createPlayerIcon = (initial: string) => L.divIcon({
 });
 
 export default function RoundResults() {
-    const { currentRoom } = useGame();
+    const { currentRoom, nextRound } = useGame();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -35,6 +35,14 @@ export default function RoundResults() {
     const target = currentRoom.currentRoundData;
     const players = Object.values(currentRoom.players).sort((a, b) => (b.lastRoundScore || 0) - (a.lastRoundScore || 0));
     const winner = players[0];
+
+    useEffect(() => {
+        if (currentRoom?.currentState === 'PLAYING') {
+            navigate(`/game/${currentRoom.roomCode}`);
+        } else if (currentRoom?.currentState === 'GAME_ENDED') {
+            navigate(`/podium/${currentRoom.roomCode}`);
+        }
+    }, [currentRoom, navigate]);
 
     return (
         <div className="h-screen flex flex-col bg-dark-900 text-white overflow-hidden">
@@ -121,7 +129,9 @@ export default function RoundResults() {
                         ))}
                     </div>
 
-                    <button className="w-full mt-6 bg-brand-500 hover:bg-brand-600 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 group">
+                    <button
+                        onClick={() => currentRoom && nextRound(currentRoom.roomCode)}
+                        className="w-full mt-6 bg-brand-500 hover:bg-brand-600 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 group">
                         NEXT ROUND <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </button>
                 </div>

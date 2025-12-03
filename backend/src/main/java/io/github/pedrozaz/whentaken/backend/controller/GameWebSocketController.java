@@ -86,4 +86,19 @@ public class GameWebSocketController {
             messagingTemplate.convertAndSendToUser(userId, "/queue/errors", e.getMessage());
         }
     }
+
+    @MessageMapping("/next-round")
+    public void nextRound(@Payload String roomCode, SimpMessageHeaderAccessor headerAccessor, Principal principal) {
+        String sessionId = headerAccessor.getSessionId();
+        String userId = principal.getName();
+
+        log.info("Request to next round from user: {} (Session: {})", userId, sessionId);
+
+        try {
+            GameRoom updatedRoom = gameService.nextRound(roomCode, sessionId);
+            messagingTemplate.convertAndSend("/topic/game/" + roomCode, updatedRoom);
+        } catch (RuntimeException e) {
+            messagingTemplate.convertAndSendToUser(userId, "/queue/errors", e.getMessage());
+        }
+    }
 }
