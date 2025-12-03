@@ -15,11 +15,6 @@ public class GameRoom {
 
     private long roundEndTime;
 
-    private String currentImageUrl;
-    private double currentTargetLat;
-    private double currentTargetLon;
-    private int currentTargetYear;
-
     private int currentRoundNumber = 0;
     private int totalRounds = 5;
     private RoundData currentRoundData;
