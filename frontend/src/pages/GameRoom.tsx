@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {useGame} from "../context/GameContext.tsx";
 import {MapPin} from "lucide-react";
@@ -29,6 +29,26 @@ export default function GameRoom() {
             navigate(`/results/${currentRoom.roomCode}`);
         }
     }, [currentRoom, navigate]);
+
+    useEffect(() => {
+        setHasGuessed(false);
+        setSelectedLocation(null);
+        setSelectedYear(2000);
+    }, [currentRoom?.currentRoundNumber]);
+
+    const handleTimeUp = useCallback(() => {
+        if (hasGuessed) return;
+
+        console.log("Tempo esgotado! Enviando seleção atual...");
+
+        const lat = selectedLocation?.lat || 0;
+        const lng = selectedLocation?.lng || 0;
+
+        if (currentRoom?.roomCode) {
+            submitGuess(currentRoom.roomCode, lat, lng, selectedYear);
+            setHasGuessed(true);
+        }
+    }, [hasGuessed, selectedLocation, selectedYear, currentRoom, submitGuess]);
 
     const handleConfirmGuess = () => {
         console.log("Sending guess");
@@ -72,13 +92,13 @@ export default function GameRoom() {
                 <div className="absolute top-4 left-4 bg-dark-900/80 backdrop-blur px-4 py-2 rounded-full flex items-center gap-2 border border-white/10 shadow-lg z-[1000]">
                     <span className="font-bold text-brand-500">ROUND {currentRoom.currentRoundNumber}/{currentRoom.totalRounds}</span>
                     <div className="h-4 w-px bg-white/20"></div>
-                    <GameTimer initialTime={60} onTimeUp={() => console.log("Time's up")} />
+                    <GameTimer initialTime={60} onTimeUp={handleTimeUp} />
                 </div>
             </div>
 
             <div className="h-1/3 md:h-full md:w-1/3 bg-dark-800 border-l border-white/5 p-4 flex flex-col relative z-10">
                 <h2 className="text-xl font-black mb-4 flex items-center gap-2">
-                    <MapPin className="text-brand-500" /> YOUR GUESS
+                    <MapPin className="text-brand-500" /> TAKE A GUESS
                 </h2>
 
                 <div className="flex-1 bg-slate-700 rounded-xl mb-4 border-2 border-slate-600 overflow-hidden relative isolate">
