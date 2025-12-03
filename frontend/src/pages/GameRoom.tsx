@@ -1,28 +1,18 @@
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import {useGame} from "../context/GameContext.tsx";
-import {MapPin, Clock} from "lucide-react";
+import {MapPin} from "lucide-react";
+import GameTimer from "../components/GameTimer.tsx";
 
 export default function GameRoom() {
     const {currentRoom} = useGame();
     const navigate = useNavigate();
-    const [timeLeft, setTimeLeft] = useState(60);
 
     useEffect(() => {
         if (!currentRoom || !currentRoom.currentRoundData) {
             navigate("/");
         }
     }, [currentRoom, navigate]);
-
-    useEffect(() => {
-        if (timeLeft <= 0) return;
-
-        const timer = setInterval(() => {
-            setTimeLeft((prev) => prev - 1);
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, []);
 
     if (!currentRoom?.currentRoundData) return <div className="text-white p-10">Loading Round...</div>;
 
@@ -48,11 +38,7 @@ export default function GameRoom() {
                     <span className="font-bold text-brand-500">ROUND {currentRoom.currentRoundNumber}/{currentRoom.totalRounds}</span>
                     <div className="h-4 w-px bg-white/20"></div>
 
-                    {/* Timer Visual */}
-                    <Clock className={`w-4 h-4 ${timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-white'}`} />
-                    <span className={`font-mono ${timeLeft < 10 ? 'text-red-500' : 'text-white'}`}>
-                00:{timeLeft.toString().padStart(2, '0')}
-            </span>
+                    <GameTimer initialTime={60} onTimeUp={() => console.log("Time's up!")} />
                 </div>
             </div>
 
