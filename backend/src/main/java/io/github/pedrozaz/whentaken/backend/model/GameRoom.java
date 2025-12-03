@@ -20,6 +20,10 @@ public class GameRoom {
     private double currentTargetLon;
     private int currentTargetYear;
 
+    private int currentRoundNumber = 0;
+    private int totalRounds = 5;
+    private RoundData currentRoundData;
+
     private final Map<String, Player> players = new ConcurrentHashMap<>();
 
     public void addPlayer(Player player) {

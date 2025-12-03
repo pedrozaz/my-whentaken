@@ -9,6 +9,7 @@ interface GameContextType {
     currentRoom: GameRoom | null;
     createRoom: (nickname: string) => void;
     joinRoom: (roomCode: string, nickname: string) => void;
+    startGame: (roomCode: string) => void;
 }
 
 const GameContext = createContext<GameContextType>({} as GameContextType);
@@ -94,11 +95,23 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         });
     };
 
+    const startGame = (roomCode: string) => {
+        if (!stompClient.current?.connected) return;
+
+        console.log('Sending START to room:', roomCode);
+        stompClient.current.publish({
+            destination: '/app/start',
+            body: roomCode,
+        });
+    };
+
     return (
-        <GameContext.Provider value={{ connected, currentRoom, createRoom, joinRoom }}>
+        <GameContext.Provider value={{ connected, currentRoom, createRoom, joinRoom, startGame }}>
             {children}
         </GameContext.Provider>
     );
+
+
 }
 
 export function useGame() {

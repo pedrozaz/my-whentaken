@@ -5,12 +5,16 @@ import { Users, Copy, Play, MapPin } from "lucide-react";
 
 export default function Lobby() {
     const { roomCode } = useParams();
-    const { currentRoom, connected } = useGame();
+    const { currentRoom, connected, startGame } = useGame();
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!currentRoom) {
-            navigate('/');
+        if (!currentRoom) navigate('/');
+    }, [currentRoom, navigate]);
+
+    useEffect(() => {
+        if (currentRoom?.currentState === 'PLAYING') {
+            navigate(`/game/${currentRoom.roomCode}`);
         }
     }, [currentRoom, navigate]);
 
@@ -86,6 +90,7 @@ export default function Lobby() {
                 </div>
 
                 <button
+                    onClick={() => startGame(roomCode || '')}
                     className="w-full bg-white hover:bg-slate-200 text-dark-900 font-black py-4 rounded-xl shadow-xl shadow-white/10 active:scale-95 transition-all flex items-center justify-center gap-2 uppercase tracking-wide text-lg"
                 >
                     <Play className="w-6 h-6 fill-current" />

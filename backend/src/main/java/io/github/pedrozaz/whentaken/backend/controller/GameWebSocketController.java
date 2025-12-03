@@ -55,4 +55,18 @@ public class GameWebSocketController {
             messagingTemplate.convertAndSendToUser(sessionId, "/queue/errors", e.getMessage());
          }
     }
+
+    @MessageMapping("/start")
+    public void startGame(@Payload String roomCode, SimpMessageHeaderAccessor headerAccessor, Principal principal) {
+        String sessionId = headerAccessor.getSessionId();
+        log.info("Request to start game in room {} from session: {}", roomCode, sessionId);
+
+        try {
+            GameRoom startedRoom = gameService.startGame(roomCode, sessionId);
+
+            messagingTemplate.convertAndSend("/topic/game/" + roomCode, startedRoom);
+        } catch (RuntimeException e) {
+            messagingTemplate.convertAndSendToUser(principal.getName(), "/queue/errors", e.getMessage());
+        }
+    }
 }
