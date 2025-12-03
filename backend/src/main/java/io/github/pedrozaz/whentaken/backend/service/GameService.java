@@ -1,5 +1,6 @@
 package io.github.pedrozaz.whentaken.backend.service;
 
+import io.github.pedrozaz.whentaken.backend.dto.GuessRequest;
 import io.github.pedrozaz.whentaken.backend.model.GameRoom;
 import io.github.pedrozaz.whentaken.backend.model.GameState;
 import io.github.pedrozaz.whentaken.backend.model.Player;
@@ -85,5 +86,55 @@ public class GameService {
         room.setRoundEndTime(System.currentTimeMillis() + 60000);
 
         return room;
+    }
+
+    public GameRoom processGuess(String sessionId, GuessRequest request) {
+        GameRoom room = gameRepository.findByRoomCode(request.roomCode())
+                .orElseThrow(() -> new RuntimeException("Room not found: " + request.roomCode()));
+
+        Player player = room.getPlayers().get(sessionId);
+        if (player == null) throw new RuntimeException("Player not found");
+
+        if (player.getLastGuessLat() != null) {
+            throw new RuntimeException("You've already guessed this round!");
+        }
+
+        RoundData target = room.getCurrentRoundData();
+        int distanceScore =  calculateDistanceScore(request.lat(), request.lon(), target.lat(), target.lon());
+        int yearScore = calculateYearScore(request.year(), target.year());
+        int totalRoundScore = (distanceScore + yearScore) / 2;
+
+        player.setLastGuessLat(request.lat());
+        player.setLastGuessLon(request.lon());
+        player.setLastGuessYear(request.year());
+        player.setLastRoundScore(totalRoundScore);
+        player.setTotalScore(player.getTotalScore() + totalRoundScore);
+
+        boolean allGuessed = room.getPlayers().values().stream()
+                .allMatch(p -> p.getLastGuessLat() != null);
+
+        return room;
+    }
+
+    private int calculateDistanceScore(double lat1, double lon1, double lat2, double lon2) {
+        double distanceKm = haversine(lat1, lon1, lat2, lon2);
+        return (int) (2500 * Math.exp(-distanceKm / 2000.0));
+    }
+
+    private int calculateYearScore(int guessYear, int actualYear) {
+        int diff = Math.abs(guessYear - actualYear);
+        if (diff == 0) return 2500;
+        return (int) (2500 * Math.exp(-diff / 10.0));
+    }
+
+    private double haversine(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6371;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
     }
 }

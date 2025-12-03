@@ -1,6 +1,7 @@
 package io.github.pedrozaz.whentaken.backend.controller;
 
 import io.github.pedrozaz.whentaken.backend.dto.CreateRoomRequest;
+import io.github.pedrozaz.whentaken.backend.dto.GuessRequest;
 import io.github.pedrozaz.whentaken.backend.dto.JoinRequest;
 import io.github.pedrozaz.whentaken.backend.model.GameRoom;
 import io.github.pedrozaz.whentaken.backend.service.GameService;
@@ -67,6 +68,22 @@ public class GameWebSocketController {
             messagingTemplate.convertAndSend("/topic/game/" + roomCode, startedRoom);
         } catch (RuntimeException e) {
             messagingTemplate.convertAndSendToUser(principal.getName(), "/queue/errors", e.getMessage());
+        }
+    }
+
+    @MessageMapping("/guess")
+    public void submitGuess(@Payload GuessRequest request, SimpMessageHeaderAccessor headerAccessor, Principal principal) {
+        String sessionId = headerAccessor.getSessionId();
+        String userId = principal.getName();
+
+        log.info("Request to submit guess from user: {} (Session: {})", userId, sessionId);
+
+        try {
+            GameRoom updatedRoom = gameService.processGuess(sessionId, request);
+
+            messagingTemplate.convertAndSend("/topic/game/" + request.roomCode(), updatedRoom);
+        } catch (RuntimeException e) {
+            messagingTemplate.convertAndSendToUser(userId, "/queue/errors", e.getMessage());
         }
     }
 }
