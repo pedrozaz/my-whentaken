@@ -1,12 +1,15 @@
-FROM maven:3.9.6-eclipse-temurin-21 AS backend-build
+FROM eclipse-temurin:21-jdk-alpine AS backend-build
+WORKDIR /app
 
-WORKDIR /app/backend
+COPY ./backend ./backend
 
-COPY backend/pom.xml .
-RUN mvn dependency:go-offline
+RUN ./backend/mvnw -f ./backend/pom.xml clean package -DskipTests
 
-COPY backend/src ./src
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
 
-COPY --from=frontend-build /app/frontend/dist ./src/main/resources/static
+COPY --from=backend-build /app/backend/target/*.jar app.jar
+COPY --from=backend-build /app/backend/src/main/resources/rounds_data.json ./rounds_data.json
 
-RUN mvn clean package -DskipTests
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
