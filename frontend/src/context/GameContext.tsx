@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useRef, useState } from 'r
 import { Client } from '@stomp/stompjs';
 import type {GameRoom} from '../types';
 
-const BROKER_URL = 'ws://localhost:8080/ws';
+const BROKER_URL = 'wss://my-whentaken.onrender.com/ws';
 
 interface GameContextType {
     connected: boolean;
