@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useRef, useState } from 'r
 import { Client } from '@stomp/stompjs';
 import type {GameRoom} from '../types';
 
-const BROKER_URL = 'wss://my-whentaken.onrender.com:5123/ws';
+const BROKER_URL = 'wss://my-whentaken.onrender.com/ws';
 
 interface GameContextType {
     connected: boolean;
@@ -23,7 +23,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const client = new Client({
-            brokerURL: BROKER_URL,
+            webSocketFactory: () => new WebSocket(BROKER_URL),
             reconnectDelay: 5000,
             onConnect: () => {
                 setConnected(true);
