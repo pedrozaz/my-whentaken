@@ -3,7 +3,7 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import type {GameRoom} from '../types';
 
-const BROKER_URL = "https://my-whentaken.onrender.com/ws";
+const BROKER_URL = "https://my-whentaken.onrender.com/ws/";
 
 interface GameContextType {
     connected: boolean;
