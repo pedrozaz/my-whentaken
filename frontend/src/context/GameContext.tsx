@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import type {GameRoom} from '../types';
 
 const BROKER_URL = 'wss://my-whentaken.onrender.com/ws';
@@ -23,15 +24,21 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const client = new Client({
-            webSocketFactory: () => new WebSocket(BROKER_URL),
+            brokerURL: undefined,
+            webSocketFactory: () => new SockJS(BROKER_URL),
+
             reconnectDelay: 5000,
+            heartbeatIncoming: 10000,
+            heartbeatOutgoing: 10000,
+
+            debug: (msg) => console.log(msg),
+
             onConnect: () => {
                 setConnected(true);
 
                 client.subscribe('/user/queue/reply', (message) => {
                     const room: GameRoom = JSON.parse(message.body);
                     handleRoomUpdate(room);
-
                     subscribeToRoomTopic(client, room.roomCode);
                 });
 
@@ -39,8 +46,9 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
                     alert('Erro: ' + message.body);
                 });
             },
+
             onStompError: (frame) => {
-                console.error('❌ Broker error: ' + frame.headers['message']);
+                console.error('❌ STOMP Error:', frame.headers['message']);
             }
         });
 
