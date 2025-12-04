@@ -11,4 +11,5 @@ public class AppConfig {
     public RestClient.Builder restClientBuilder() {
         return RestClient.builder();
     }
+
 }

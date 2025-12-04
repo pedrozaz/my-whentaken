@@ -20,7 +20,7 @@ RUN mvn dependency:go-offline
 
 COPY backend/src ./src
 
-COPY --from=frontend-build /app/frontend/dist ./src/main/resources/static
+COPY --from=frontend-build /app/frontend/dist /app/static-frontend
 
 RUN mvn clean package -DskipTests
 
