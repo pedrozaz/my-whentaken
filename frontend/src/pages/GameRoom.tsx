@@ -39,8 +39,6 @@ export default function GameRoom() {
     const handleTimeUp = useCallback(() => {
         if (hasGuessed) return;
 
-        console.log("Tempo esgotado! Enviando seleção atual...");
-
         const lat = selectedLocation?.lat || 0;
         const lng = selectedLocation?.lng || 0;
 
@@ -51,10 +49,6 @@ export default function GameRoom() {
     }, [hasGuessed, selectedLocation, selectedYear, currentRoom, submitGuess]);
 
     const handleConfirmGuess = () => {
-        console.log("Sending guess");
-        console.log("Status connection:", connected);
-        console.log("Status guessed:", hasGuessed);
-
         if (hasGuessed) return;
 
         if (!connected) {
@@ -71,7 +65,6 @@ export default function GameRoom() {
             submitGuess(currentRoom.roomCode, selectedLocation.lat, selectedLocation.lng, selectedYear);
 
             setHasGuessed(true);
-            console.log("hasGuessed TRUE");
         }
     };
 

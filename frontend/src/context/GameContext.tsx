@@ -25,13 +25,10 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         const client = new Client({
             brokerURL: BROKER_URL,
             reconnectDelay: 5000,
-            debug: (str) => console.log('STOMP Debug:', str),
             onConnect: () => {
-                console.log('✅ Global WebSocket Connected');
                 setConnected(true);
 
                 client.subscribe('/user/queue/reply', (message) => {
-                    console.log('📩 Message received /user/queue/reply');
                     const room: GameRoom = JSON.parse(message.body);
                     handleRoomUpdate(room);
 
@@ -39,7 +36,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
                 });
 
                 client.subscribe('/user/queue/errors', (message) => {
-                    console.error('🔥 Server error:', message.body);
                     alert('Erro: ' + message.body);
                 });
             },
@@ -57,7 +53,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const subscribeToRoomTopic = (client: Client, roomCode: string) => {
-        console.log(`🎧 Listening: /topic/game/${roomCode}`);
         client.subscribe(`/topic/game/${roomCode}`, (message) => {
             const room: GameRoom = JSON.parse(message.body);
             handleRoomUpdate(room);
@@ -65,7 +60,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     };
 
     const handleRoomUpdate = (roomData: GameRoom) => {
-        console.log('📦 Room Update State:', roomData);
         setCurrentRoom(roomData);
     };
 
@@ -75,7 +69,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             return;
         }
 
-        console.log('📤 CREATE /app/create');
         stompClient.current.publish({
             destination: '/app/create',
             body: JSON.stringify({ nickname })
@@ -84,8 +77,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
     const joinRoom = (roomCode: string, nickname: string) => {
         if (!stompClient.current?.connected) return;
-
-        console.log(`📤 JOIN ${roomCode}`);
 
         if (stompClient.current) {
             subscribeToRoomTopic(stompClient.current, roomCode);
@@ -100,7 +91,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     const startGame = (roomCode: string) => {
         if (!stompClient.current?.connected) return;
 
-        console.log('Sending START to room:', roomCode);
         stompClient.current.publish({
             destination: '/app/start',
             body: roomCode,
@@ -109,7 +99,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
     const submitGuess = (roomCode: string, lat: number, lon: number, year: number) => {
         if (!stompClient.current?.connected) return;
-        console.log("Sending guess:", {roomCode, lat, lon, year});
         stompClient.current.publish({
             destination: '/app/guess',
             body: JSON.stringify({ roomCode, lat, lon, year }),
