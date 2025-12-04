@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import { useGame } from "../context/GameContext.tsx";
-import { Users, Copy, Play, MapPin } from "lucide-react";
+import { Users, Copy, Play } from "lucide-react";
+import Header from "../components/Header.tsx";
 
 export default function Lobby() {
     const { roomCode } = useParams();
-    const { currentRoom, connected, startGame } = useGame();
+    const { currentRoom, startGame } = useGame();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -30,18 +31,7 @@ export default function Lobby() {
     return (
         <div className="min-h-screen flex flex-col items-center p-4 bg-gradient-to-b from-dark-900 to-[#1a0508]">
 
-            <div className="w-full max-w-4xl flex justify-between items-center py-6 mb-8">
-                <div className="flex items-center gap-2 text-brand-500">
-                    <MapPin className="w-6 h-6" />
-                    <span className="font-black text-xl tracking-tighter text-white">WHEN TAKEN</span>
-                </div>
-                <div className="flex items-center gap-2 text-slate-400 bg-dark-800 px-4 py-2 rounded-full border border-white/5">
-                    <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500' : 'bg-red-500'}`} />
-                    <span className="text-xs font-bold uppercase tracking-wider">
-                {connected ? 'Live' : 'Offline'}
-            </span>
-                </div>
-            </div>
+            <Header />
 
             <main className="w-full max-w-2xl space-y-6">
 

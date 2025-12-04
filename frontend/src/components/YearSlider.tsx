@@ -14,15 +14,15 @@ export default function YearSlider({ selectedYear, onChange }: YearSliderProps) 
             <input
                 type="range"
                 min="1900"
-                max="2024"
+                max="2025"
                 value={selectedYear}
                 onChange={(e) => onChange(parseInt(e.target.value))}
-                className="w-full h-2 bg-dark-900 rounded-lg appearance-none cursor-pointer accent-brand-500"
+                className="w-full h-3 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-brand-500 hover:bg-slate-600 transition-colors"
             />
 
             <div className="flex justify-between text-xs text-slate-500 mt-1 font-mono">
                 <span>1900</span>
-                <span>2024</span>
+                <span>2025</span>
             </div>
         </div>
     );
